@@ -53,3 +53,4 @@ que el código ya vuelve obvias.
 | D47 | 240 frames de techo, con 540 px por encima de 120 | más resolución temporal a cambio de menos espacial; la memoria no crece |
 | D48 | Se quitaron los efectos de NAL y de tabla del MP4 | Chrome descarta el frame roto: no hay efecto que enseñar |
 | D49 | «Ordenar el AVI» avisa en un chip cuando la salida no es AVI | es un efecto que solo existe en el archivo exportado; callarlo sería mentir |
+| D50 | El audio se copia del original y se recoloca con la secuencia | recodificar perdería calidad; copiar paquetes y reordenarlos sigue a los frames |

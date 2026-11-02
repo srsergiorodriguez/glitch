@@ -125,8 +125,16 @@ video; uno que lo ignora, el otro.
 
 `video.samples` invertía bytes en los NAL y `video.table` ensuciaba la tabla de tamaños. Medido:
 Chrome no reparte el error, **descarta el frame** y mantiene el anterior, así que el efecto visible
-era un video congelado o en negro. Sin nada que enseñar, los dos efectos se quitaron; lo que queda
-del camino es el AVI (MJPEG sí tolera) y el datamosh real, que se exporta.
+era un video congelado o en negro. Se quitaron los dos; quedan el AVI (MJPEG sí tolera) y el
+datamosh real, que se exporta.
+
+### Audio: seguir a los frames (hecho)
+
+El MP4 exportado puede llevar el sonido del archivo original. No se recodifica: se copian los
+paquetes AAC y se recolocan según la secuencia, así que cada frame se lleva su trozo y los duplicados
+lo repiten. El muxer exige orden de tiempo, así que se agrupan por frame de origen y se escriben en el
+orden de la secuencia. Verificado con un export invertido: misma duración y energía, y su envolvente
+correlaciona **0.98** con el original invertido y **-0.85** con el original.
 
 ### Datamosh real: romper los I-frames (hecho)
 

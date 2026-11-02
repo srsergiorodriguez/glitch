@@ -22,7 +22,8 @@ let total = 0;
 const rows = [];
 for (const file of files) {
   const text = await readFile(file, 'utf8');
-  const lines = text.split('\n').length;
+  // un archivo que acaba en salto de línea no tiene una línea vacía de más
+  const lines = text.replace(/\n+$/, '').split('\n').length;
   total += lines;
   rows.push({ file, lines, over: lines > LIMIT_DOC });
 }

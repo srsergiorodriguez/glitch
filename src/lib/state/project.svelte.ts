@@ -21,6 +21,7 @@ import { decodeGif } from '../codecs/gif/decode';
 import { encodeGif, encodeGifFrame, prepareGif, type GifPrepared } from '../codecs/gif/encode';
 import { framesToVideo, canEncodeVideo } from '../export/video';
 import { framesToAvi } from '../export/avi';
+import type { AudioPlan } from '../export/audio';
 import { datamoshVideo } from '../export/datamosh';
 import { reorderAvi } from '../codecs/avi/read';
 import { hasAviReorder } from '../core/video-settings';
@@ -66,6 +67,8 @@ export const project = $state({
   info: '',
   aviReorder: false,
   videoDuration: 0,
+  withAudio: true,
+  hasAudioSource: false,
   datamoshEvery: 1,
   captureFrom: 0,
   captureTo: 0,
@@ -438,6 +441,7 @@ async function captureFromVideo(file: File): Promise<void> {
     project.sequence = [];
     project.current = 0;
     project.videoDuration = Math.round(captured.duration);
+    project.hasAudioSource = true;
     project.captureFrom = Math.round(captured.start * 10) / 10;
     project.captureTo = Math.round((captured.start + captured.frames.length / captured.fps) * 10) / 10;
     project.fps = Math.max(1, Math.min(60, captured.fps));
@@ -693,7 +697,21 @@ async function buildVideo(): Promise<{ blob: Blob; extension: 'mp4' | 'webm' }> 
     bitmap,
     delay: outputDelays[index] ?? defaultDelay(),
   }));
-  return await framesToVideo(frames);
+  return await framesToVideo(frames, { audio: buildAudioPlan() });
+}
+
+/** Plan de audio: cada posición de la secuencia se lleva el trozo de sonido de su frame. */
+function buildAudioPlan(): AudioPlan | null {
+  if (!videoFile || !project.withAudio || project.sequence.length === 0) return null;
+  const srcSpan = 1 / Math.max(1, project.fps);
+  const from = project.captureFrom;
+  let outStart = 0;
+  const slots = project.sequence.map((entry) => {
+    const slot = { sourceIndex: entry.index, outStart };
+    outStart += entry.delay / 1000;
+    return slot;
+  });
+  return { file: videoFile, from, srcSpan, slots };
 }
 
 /** Datamosh real sobre el archivo original: reescribe los paquetes y quema los I-frames. */

@@ -4,6 +4,7 @@
   import Button from './lib/ui/Button.svelte';
   import IconButton from './lib/ui/IconButton.svelte';
   import Select from './lib/ui/Select.svelte';
+  import Checkbox from './lib/ui/Checkbox.svelte';
   import TrimModal from './lib/ui/TrimModal.svelte';
   import Stage from './lib/ui/Stage.svelte';
   import Field from './lib/ui/Field.svelte';
@@ -705,6 +706,15 @@
             onchange={(value) => setOutput(value as 'png' | 'gif' | 'mp4' | 'avi')}
           />
         </Field>
+
+        {#if project.hasAudioSource && project.output === 'mp4'}
+          <Checkbox
+            id="audio"
+            label="Con el sonido original"
+            checked={project.withAudio}
+            onchange={(checked) => (project.withAudio = checked)}
+          />
+        {/if}
 
         <Button
           variant="primary"

@@ -26,6 +26,7 @@ programación creativa y humanidades digitales.
 | AVI propio con MJPEG y reordenamiento de chunks con índice obsoleto | hecho |
 | Moshing: desgarro del JPEG frame a frame, visible y horneable en MP4 | hecho |
 | Reusar P-frames: movimiento nuevo sobre imagen congelada | hecho |
+| Exportar MP4 con el audio original, recolocado según la secuencia | hecho |
 | Datamosh real: I-frames sustituidos por P-frames, exportado para VLC | hecho |
 | Exportar PNG y GIF; descargar el archivo corrupto | hecho |
 

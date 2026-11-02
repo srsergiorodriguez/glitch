@@ -8,6 +8,7 @@ import {
   type OutputFormat,
 } from 'mediabunny';
 import type { Bitmap } from '../core/types';
+import { addAudioTrack, type AudioPlan } from './audio';
 
 export type VideoFrameInput = { bitmap: Bitmap; delay: number };
 
@@ -25,6 +26,7 @@ async function encode(
   format: OutputFormat,
   codec: 'avc' | 'vp9',
   allKeyframes: boolean,
+  audio: AudioPlan | null,
 ): Promise<Blob> {
   const first = frames[0].bitmap;
   // H.264 trabaja con dimensiones pares: se recorta un píxel si hace falta
@@ -38,7 +40,24 @@ async function encode(
   const source = new CanvasSource(canvas, { codec, quality: new Quality('high') });
   output.addVideoTrack(source);
 
+  let audioTrack: Awaited<ReturnType<typeof addAudioTrack>> = null;
+  if (audio) {
+    try {
+      audioTrack = await addAudioTrack(output, audio);
+    } catch {
+      audioTrack = null;
+    }
+  }
+
   await output.start();
+
+  if (audioTrack) {
+    try {
+      await audioTrack.feed();
+    } catch {
+      // si el audio no encaja en este contenedor, el video sale igual
+    }
+  }
 
   let time = 0;
   for (const frame of frames) {
@@ -64,16 +83,17 @@ async function encode(
 /** Video con los frames ya procesados: MP4 si el navegador puede, WebM si no. */
 export async function framesToVideo(
   frames: VideoFrameInput[],
-  options: { allKeyframes?: boolean } = {},
+  options: { allKeyframes?: boolean; audio?: AudioPlan | null } = {},
 ): Promise<{ blob: Blob; extension: 'mp4' | 'webm' }> {
   if (frames.length === 0) throw new Error('no hay frames que exportar');
   const allKeyframes = options.allKeyframes ?? false;
+  const audio = options.audio ?? null;
 
   try {
-    const blob = await encode(frames, new Mp4OutputFormat(), 'avc', allKeyframes);
+    const blob = await encode(frames, new Mp4OutputFormat(), 'avc', allKeyframes, audio);
     return { blob, extension: 'mp4' };
   } catch {
-    const blob = await encode(frames, new WebMOutputFormat(), 'vp9', allKeyframes);
+    const blob = await encode(frames, new WebMOutputFormat(), 'vp9', allKeyframes, audio);
     return { blob, extension: 'webm' };
   }
 }
