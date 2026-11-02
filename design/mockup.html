@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>glitch · propuesta de interfaz</title>
+<style>
+  :root {
+    --bg-0: #0c0c0e;
+    --bg-1: #131316;
+    --bg-2: #1a1a1f;
+    --bg-3: #222229;
+    --line: #26262c;
+    --line-2: #34343c;
+    --fg-1: #e9e9ee;
+    --fg-2: #9c9ca8;
+    --fg-3: #6a6a76;
+    --accent: #d8ff3e;
+    --cyan: #22e0ff;
+    --magenta: #ff2e88;
+    --warn: #ffb74d;
+    --danger: #ff5d5d;
+    --mono: ui-monospace, "SF Mono", Menlo, monospace;
+    --ui: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    --h-menu: 38px;
+    --h-timeline: 140px;
+    --w-left: 288px;
+    --w-right: 320px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    background: var(--bg-0);
+    color: var(--fg-1);
+    font: 12px/1.35 var(--ui);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  .app {
+    display: grid;
+    grid-template-rows: var(--h-menu) 1fr var(--h-timeline);
+    height: 100vh;
+  }
+
+  /* ── menubar ───────────────────────────────────────────── */
+
+  .menubar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 10px 0 12px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand { font-family: var(--mono); font-size: 13px; letter-spacing: 0.16em; }
+  .brand span { color: var(--accent); }
+
+  .menu { display: flex; gap: 2px; }
+  .menu__item { padding: 4px 8px; color: var(--fg-2); border-radius: 3px; }
+  .menu__item--active { background: var(--bg-3); color: var(--fg-1); }
+
+  .spacer { flex: 1; }
+
+  .readout { font-family: var(--mono); font-size: 11px; color: var(--fg-3); }
+  .readout b { color: var(--fg-2); font-weight: 400; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 20px;
+    padding: 0 7px;
+    border: 1px solid var(--line-2);
+    border-radius: 2px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: var(--fg-2);
+    text-transform: uppercase;
+  }
+
+  .chip::before {
+    content: "";
+    width: 4px; height: 4px;
+    background: currentColor;
+    border-radius: 50%;
+  }
+
+  .chip--warn { color: var(--warn); border-color: #4a3a22; }
+
+  .btn {
+    height: 24px;
+    padding: 0 10px;
+    border: 1px solid var(--line-2);
+    border-radius: 2px;
+    background: var(--bg-2);
+    color: var(--fg-1);
+    font: 11px/1 var(--ui);
+    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn--ghost { background: transparent; }
+  .btn--icon { width: 26px; padding: 0; justify-content: center; }
+
+  .btn--primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0b0b0d;
+    font-weight: 600;
+    position: relative;
+  }
+
+  .btn--primary::before,
+  .btn--primary::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 2px;
+    pointer-events: none;
+  }
+
+  .btn--primary::before { border-left: 1px solid rgba(34, 224, 255, 0.55); transform: translateX(-1px); }
+  .btn--primary::after  { border-right: 1px solid rgba(255, 46, 136, 0.55); transform: translateX(1px); }
+
+  .ico-play {
+    width: 0; height: 0;
+    border-left: 7px solid var(--fg-1);
+    border-top: 4.5px solid transparent;
+    border-bottom: 4.5px solid transparent;
+  }
+
+  .ico-prev {
+    width: 0; height: 0;
+    border-right: 7px solid var(--fg-2);
+    border-top: 4.5px solid transparent;
+    border-bottom: 4.5px solid transparent;
+  }
+
+  .caret {
+    width: 0; height: 0;
+    border-top: 3px solid currentColor;
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
+  }
+
+  /* ── workspace ─────────────────────────────────────────── */
+
+  .workspace {
+    display: grid;
+    grid-template-columns: var(--w-left) 1fr var(--w-right);
+    min-height: 0;
+  }
+
+  .panel {
+    background: var(--bg-1);
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .panel--left { border-right: 1px solid var(--line); }
+  .panel--right { border-left: 1px solid var(--line); }
+
+  .panel__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 26px;
+    padding: 0 10px;
+    border-bottom: 1px solid var(--line);
+    font-size: 10px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--fg-2);
+    flex: none;
+  }
+
+  .panel__no {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--fg-3);
+    letter-spacing: 0.04em;
+  }
+
+  .panel__body {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-3);
+  }
+
+  .thumb {
+    height: 82px;
+    border: 1px solid var(--line-2);
+    border-radius: 2px;
+    background: url(frame-thumb.jpg) center / cover no-repeat var(--bg-2);
+  }
+
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--fg-3);
+    padding-top: 6px;
+  }
+
+  .presets { display: flex; flex-direction: column; }
+
+  .preset {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 5px 6px;
+    border-bottom: 1px solid var(--line);
+    color: var(--fg-2);
+  }
+
+  .preset i { font-family: var(--mono); font-size: 9px; color: var(--fg-3); font-style: normal; }
+  .preset--active { background: var(--bg-2); color: var(--fg-1); }
+
+  /* ── stage ─────────────────────────────────────────────── */
+
+  .stage {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-0);
+    min-width: 0;
+  }
+
+  .viewer {
+    position: relative;
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding: 24px 40px 18px;
+    min-height: 0;
+  }
+
+  .frame {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    height: 100%;
+    max-height: 100%;
+    max-width: 100%;
+    border: 1px solid var(--line-2);
+    overflow: hidden;
+    background: #000 url(frame.jpg) center / cover no-repeat;
+  }
+
+  .frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.45);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .frame__guide {
+    position: absolute;
+    inset: 9%;
+    border: 1px dashed rgba(233, 233, 238, 0.14);
+    transform: translate(1px, 1px);
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .reg {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    pointer-events: none;
+    opacity: 0.45;
+    z-index: 4;
+  }
+
+  .reg::before, .reg::after {
+    content: "";
+    position: absolute;
+    background: var(--fg-2);
+  }
+
+  .reg::before { left: 4px; top: 0; width: 1px; height: 9px; }
+  .reg::after { top: 4px; left: 0; height: 1px; width: 9px; }
+
+  .reg--tl { top: 6px; left: 6px; }
+  .reg--tr { top: 6px; right: 6px; }
+  .reg--bl { bottom: 6px; left: 6px; }
+  .reg--br { bottom: 6px; right: 6px; transform: translate(1px, 1px); opacity: 0.25; }
+
+  .frame__tag {
+    position: absolute;
+    top: 5px;
+    left: 22px;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    color: var(--fg-2);
+    z-index: 4;
+    opacity: 0.7;
+  }
+
+  .hud {
+    position: absolute;
+    left: 40px;
+    right: 40px;
+    bottom: 4px;
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--fg-3);
+  }
+
+  .hud span b { color: var(--fg-2); font-weight: 400; }
+
+  .transport {
+    flex: none;
+    height: 40px;
+    border-top: 1px solid var(--line);
+    background: var(--bg-1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 12px;
+  }
+
+  .tc {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    color: var(--fg-1);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .tc small { color: var(--fg-3); font-size: 10px; }
+
+  .scrub {
+    position: relative;
+    flex: 1;
+    height: 2px;
+    background: var(--line-2);
+  }
+
+  .scrub__fill { position: absolute; inset: 0 62% 0 0; background: var(--accent); }
+
+  .scrub__head {
+    position: absolute;
+    top: -3px;
+    left: 38%;
+    width: 1px;
+    height: 8px;
+    background: var(--accent);
+  }
+
+  /* ── inspector ─────────────────────────────────────────── */
+
+  .stack { display: flex; flex-direction: column; }
+
+  .fx {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 27px;
+    padding: 0 8px 0 6px;
+    border-bottom: 1px solid var(--line);
+    color: var(--fg-2);
+    position: relative;
+  }
+
+  .fx__no { font-family: var(--mono); font-size: 9px; color: var(--fg-3); width: 12px; }
+  .fx__name { flex: 1; }
+  .fx__kind { font-family: var(--mono); font-size: 9px; color: var(--fg-3); letter-spacing: 0.06em; }
+  .fx__dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); }
+
+  .fx--active {
+    background: var(--bg-2);
+    color: var(--fg-1);
+    box-shadow: inset 2px 0 0 var(--accent),
+                inset 3px 0 0 rgba(34, 224, 255, 0.35),
+                inset -1px 0 0 rgba(255, 46, 136, 0.3);
+  }
+
+  .fx--active .fx__name { transform: translateY(1px); }
+  .fx--off { opacity: 0.4; }
+  .fx--off .fx__dot { background: var(--fg-3); }
+
+  .params {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    padding: 11px 10px 12px;
+  }
+
+  .param {
+    display: grid;
+    grid-template-columns: 82px 1fr 44px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .param__label { font-size: 11px; color: var(--fg-2); }
+
+  .param__val {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--fg-1);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .slider { position: relative; height: 12px; display: flex; align-items: center; }
+  .slider__track { width: 100%; height: 2px; background: var(--line-2); }
+  .slider__fill { position: absolute; left: 0; width: 34%; height: 2px; background: var(--accent); }
+
+  .slider__thumb {
+    position: absolute;
+    left: 34%;
+    width: 7px;
+    height: 7px;
+    margin-left: -3px;
+    background: var(--fg-1);
+    border-radius: 1px;
+  }
+
+  .slider--alt .slider__fill { width: 68%; }
+  .slider--alt .slider__thumb { left: 68%; }
+
+  .check { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--fg-2); }
+  .check__box { width: 10px; height: 10px; border: 1px solid var(--line-2); background: var(--bg-2); }
+  .check__box--on { background: var(--accent); border-color: var(--accent); }
+
+  .select {
+    height: 22px;
+    border: 1px solid var(--line-2);
+    background: var(--bg-2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 7px;
+    font-size: 11px;
+    color: var(--fg-1);
+  }
+
+  .select i { font-style: normal; color: var(--fg-3); font-size: 9px; }
+
+  .divider { height: 1px; background: var(--line); }
+
+  .scopes { padding: 8px 10px 10px; border-top: 1px solid var(--line); }
+
+  .scopes__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--fg-2);
+    padding-bottom: 8px;
+  }
+
+  .scope {
+    position: relative;
+    height: 52px;
+    border: 1px solid var(--line);
+    background:
+      repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 34px),
+      repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 17px),
+      #101013;
+  }
+
+  .scope__fill {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(34, 224, 255, 0.75), rgba(34, 224, 255, 0.12));
+    clip-path: polygon(0 100%, 2% 86%, 5% 70%, 8% 78%, 11% 62%, 14% 49%, 17% 55%, 20% 41%,
+      23% 27%, 26% 33%, 29% 20%, 32% 12%, 35% 18%, 38% 9%, 41% 16%, 44% 7%, 47% 15%,
+      50% 24%, 53% 32%, 56% 26%, 59% 38%, 62% 48%, 65% 42%, 68% 54%, 71% 62%, 74% 56%,
+      77% 68%, 80% 76%, 83% 70%, 86% 80%, 89% 88%, 92% 82%, 95% 92%, 100% 100%);
+    opacity: 0.8;
+  }
+
+  .scope-legend {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--fg-3);
+    padding-top: 4px;
+  }
+
+  /* ── timeline ──────────────────────────────────────────── */
+
+  .timeline {
+    border-top: 1px solid var(--line);
+    background: var(--bg-1);
+    display: grid;
+    grid-template-rows: 24px 17px 1fr;
+    min-height: 0;
+  }
+
+  .timeline__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 10px;
+    border-bottom: 1px solid var(--line);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--fg-2);
+  }
+
+  .ruler {
+    display: flex;
+    gap: 3px;
+    padding: 0 10px;
+    align-items: flex-end;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ruler__tick {
+    font-family: var(--mono);
+    font-size: 8px;
+    color: var(--fg-3);
+    border-left: 1px solid var(--line-2);
+    padding-left: 3px;
+    flex: 1;
+    line-height: 1;
+    padding-bottom: 2px;
+  }
+
+  .strip {
+    position: relative;
+    display: flex;
+    gap: 3px;
+    padding: 7px 10px 12px;
+    min-height: 0;
+  }
+
+  .strip__frame {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid var(--line-2);
+    background: url(frame.jpg) center / cover no-repeat #14161c;
+  }
+
+  .strip__frame:nth-child(3n) { background-position: 20% 30%; }
+  .strip__frame:nth-child(4n) { background-position: 60% 70%; }
+  .strip__frame:nth-child(5n) { background-position: 80% 20%; }
+  .strip__frame:nth-child(7n) { background-position: 35% 55%; }
+
+  .strip__frame--lost {
+    background: repeating-linear-gradient(135deg, #17171b 0 6px, #1d1d22 6px 12px);
+    display: grid;
+    place-items: center;
+    color: var(--danger);
+    font-family: var(--mono);
+    font-size: 11px;
+    border-color: #3a2427;
+  }
+
+  .playhead {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 38%;
+    width: 1px;
+    background: var(--accent);
+    z-index: 2;
+  }
+
+  .playhead::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -3px;
+    border-left: 3.5px solid transparent;
+    border-right: 3.5px solid transparent;
+    border-top: 5px solid var(--accent);
+  }
+
+  .tl-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--fg-3);
+    letter-spacing: 0;
+  }
+
+  /* integridad: la corrupción solo existe por debajo de 100 */
+  .app[data-integrity="97"] .ruler__tick:nth-child(9) { color: transparent; border-left-color: transparent; }
+  .app[data-integrity="97"] .fx--active .fx__kind { transform: translateY(1px); }
+</style>
+</head>
+<body>
+<div class="app" data-integrity="97">
+
+  <header class="menubar">
+    <div class="brand">glit<span>c</span>h</div>
+    <nav class="menu">
+      <div class="menu__item menu__item--active">Archivo</div>
+      <div class="menu__item">Editar</div>
+      <div class="menu__item">Ver</div>
+      <div class="menu__item">Ayuda</div>
+    </nav>
+    <div class="readout">secuencia · <b>048</b> frames · <b>480×480</b> · 12 fps</div>
+    <div class="spacer"></div>
+    <div class="readout">integridad <b>97%</b></div>
+    <div class="chip chip--warn">índice obsoleto</div>
+    <div class="btn btn--ghost">Exportar <i class="caret"></i></div>
+    <div class="btn btn--primary">Aplicar</div>
+  </header>
+
+  <main class="workspace">
+
+    <aside class="panel panel--left">
+      <div class="panel__head"><span class="panel__no">01</span><span>Medios</span></div>
+      <div class="panel__body">
+        <div>
+          <div class="label">Fuente</div>
+          <div class="thumb"></div>
+          <div class="meta"><span>pedazo.gif</span><span>1.8 MB</span></div>
+        </div>
+
+        <div>
+          <div class="label">Secuencia</div>
+          <div class="meta"><span>048 frames</span><span>04:00</span></div>
+          <div class="meta"><span>480×480</span><span>12 fps</span></div>
+        </div>
+
+        <div>
+          <div class="label">Presets</div>
+          <div class="presets">
+            <div class="preset preset--active"><i>01</i>Paleta quebrada</div>
+            <div class="preset"><i>02</i>Bloom + bitflip</div>
+            <div class="preset"><i>03</i>Triturar y rezar</div>
+            <div class="preset"><i>04</i>Duotono ácido</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <section class="stage">
+      <div class="viewer">
+        <div class="frame">
+          <div class="frame__guide"></div>
+          <div class="frame__tag">A · 036</div>
+          <div class="reg reg--tl"></div>
+          <div class="reg reg--tr"></div>
+          <div class="reg reg--bl"></div>
+          <div class="reg reg--br"></div>
+        </div>
+        <div class="hud">
+          <span><b>036</b> / 048 · 480×480</span>
+          <span>proxy <b>480×270</b> · rgb24</span>
+        </div>
+      </div>
+
+      <div class="transport">
+        <div class="btn btn--ghost btn--icon"><i class="ico-prev"></i></div>
+        <div class="btn btn--ghost btn--icon"><i class="ico-play"></i></div>
+        <div class="tc">00:00:01;12 <small>/ 00:00:04;00</small></div>
+        <div class="scrub">
+          <div class="scrub__fill"></div>
+          <div class="scrub__head"></div>
+        </div>
+        <div class="chip">48/48</div>
+      </div>
+    </section>
+
+    <aside class="panel panel--right">
+      <div class="panel__head">
+        <span class="panel__no">03</span><span>PR0PIEDADES</span>
+      </div>
+
+      <div class="stack">
+        <div class="fx"><span class="fx__no">01</span><span class="fx__name">Cuantizar a 64 colores</span><span class="fx__kind">PÍXEL</span><span class="fx__dot"></span></div>
+        <div class="fx"><span class="fx__no">02</span><span class="fx__name">Dither Bayer 4×4</span><span class="fx__kind">PÍXEL</span><span class="fx__dot"></span></div>
+        <div class="fx fx--active"><span class="fx__no">03</span><span class="fx__name">Desplazar canales</span><span class="fx__kind">PÍXEL</span><span class="fx__dot"></span></div>
+        <div class="fx"><span class="fx__no">04</span><span class="fx__name">Reordenar frames</span><span class="fx__kind">FRAME</span><span class="fx__dot"></span></div>
+        <div class="fx fx--off"><span class="fx__no">05</span><span class="fx__name">Corromper LZW</span><span class="fx__kind">CÓDIGO</span><span class="fx__dot"></span></div>
+      </div>
+
+      <div class="params">
+        <div class="param">
+          <span class="param__label">desplazam.</span>
+          <span class="slider"><span class="slider__track"></span><span class="slider__fill"></span><span class="slider__thumb"></span></span>
+          <span class="param__val">12 px</span>
+        </div>
+        <div class="param">
+          <span class="param__label">canal</span>
+          <span class="select">rojo <i>▾</i></span>
+          <span class="param__val">—</span>
+        </div>
+        <div class="param">
+          <span class="param__label">% líneas</span>
+          <span class="slider slider--alt"><span class="slider__track"></span><span class="slider__fill"></span><span class="slider__thumb"></span></span>
+          <span class="param__val">0.68</span>
+        </div>
+        <div class="check"><span class="check__box check__box--on"></span>solo bordes</div>
+        <div class="check"><span class="check__box"></span>llave de registro</div>
+      </div>
+
+      <div class="scopes">
+        <div class="scopes__head"><span class="panel__no">02a</span><span>Scopes</span></div>
+        <div class="scope"><div class="scope__fill"></div></div>
+        <div class="scope-legend"><span>0</span><span>R G B</span><span>255</span></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="params">
+        <div class="param">
+          <span class="param__label">salida</span>
+          <span class="select">GIF <i>▾</i></span>
+          <span class="param__val">2.4 MB</span>
+        </div>
+        <div class="param">
+          <span class="param__label">seed</span>
+          <span class="select">81293 <i>⟳</i></span>
+          <span class="param__val">↺</span>
+        </div>
+        <div class="btn btn--primary">Exportar GIF</div>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="timeline">
+    <div class="timeline__head">
+      <span class="panel__no">02</span><span>Línea</span>
+      <div class="tl-meta">
+        <span>tira de frames</span>
+        <span>·</span>
+        <span>perdidos: 1</span>
+      </div>
+    </div>
+    <div class="ruler">
+      <div class="ruler__tick">001</div>
+      <div class="ruler__tick">005</div>
+      <div class="ruler__tick">010</div>
+      <div class="ruler__tick">015</div>
+      <div class="ruler__tick">020</div>
+      <div class="ruler__tick">025</div>
+      <div class="ruler__tick">030</div>
+      <div class="ruler__tick">035</div>
+      <div class="ruler__tick">040</div>
+      <div class="ruler__tick">045</div>
+      <div class="ruler__tick">048</div>
+    </div>
+    <div class="strip">
+      <div class="strip__frame"></div>
+      <div class="strip__frame"></div>
+      <div class="strip__frame"></div>
+      <div class="strip__frame"></div>
+      <div class="strip__frame"></div>
+      <div class="strip__frame"></div>
+      <div class="strip__frame strip__frame--lost">×</div>
+      <div class="strip__frame"></div>
+      <div class="strip__frame"></div>
+      <div class="strip__frame"></div>
+      <div class="strip__frame"></div>
+      <div class="strip__frame"></div>
+      <div class="strip__frame"></div>
+      <div class="strip__frame"></div>
+      <div class="strip__frame"></div>
+      <div class="playhead"></div>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

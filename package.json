@@ -1,0 +1,25 @@
+{
+  "name": "glitch",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Laboratorio web para corromper imágenes, gifs y videos",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "node scripts/check-styles.mjs && node scripts/check-docs.mjs && svelte-check --tsconfig ./tsconfig.json",
+    "check:styles": "node scripts/check-styles.mjs",
+    "check:docs": "node scripts/check-docs.mjs"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "svelte": "^5.57.3",
+    "svelte-check": "^4.7.8",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.5"
+  },
+  "dependencies": {
+    "mediabunny": "^1.65.0"
+  }
+}

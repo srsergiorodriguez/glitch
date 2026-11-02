@@ -1,0 +1,77 @@
+/*
+  Tokens. Fuente única de verdad del sistema de diseño.
+  Ningún componente declara colores, tamaños ni tiempos fuera de aquí.
+  --u es la escala de interfaz (100 / 125 / 150 %); se ajusta desde la barra.
+*/
+
+:root {
+  color-scheme: dark;
+
+  --u: 1;
+
+  /* superficies */
+  --bg-0: #0c0c0e;
+  --bg-1: #131316;
+  --bg-2: #1a1a1f;
+  --bg-3: #222229;
+  --bg-4: #2a2a32;
+
+  /* líneas */
+  --line: #26262c;
+  --line-2: #34343c;
+  --line-3: #44444f;
+
+  /* texto */
+  --fg-1: #e9e9ee;
+  --fg-2: #9c9ca8;
+  --fg-3: #6a6a76;
+
+  /* acento y estados */
+  --accent: #d8ff3e;
+  --accent-2: #e6ff72;
+  --accent-fg: #0b0b0d;
+  --warn: #ffb74d;
+  --danger: #ff5d5d;
+
+  /* desregistro: solo a 1px, nunca como color de superficie */
+  --mis-c: rgba(34, 224, 255, 0.55);
+  --mis-m: rgba(255, 46, 136, 0.5);
+
+  /* tipografía */
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --fs-xs: calc(10px * var(--u));
+  --fs-sm: calc(11px * var(--u));
+  --fs-md: calc(12px * var(--u));
+  --fs-lg: calc(15px * var(--u));
+
+  /* espacio */
+  --sp-1: calc(4px * var(--u));
+  --sp-2: calc(8px * var(--u));
+  --sp-3: calc(12px * var(--u));
+  --sp-4: calc(16px * var(--u));
+  --sp-5: calc(24px * var(--u));
+  --sp-6: calc(32px * var(--u));
+
+  /* medidas */
+  --h-menu: calc(38px * var(--u));
+  --h-head: calc(26px * var(--u));
+  --h-ctl: calc(24px * var(--u));
+  --h-ctl-sm: calc(20px * var(--u));
+  --h-row: calc(27px * var(--u));
+  --h-bar: calc(38px * var(--u));
+  --h-timeline: calc(88px * var(--u));
+  --w-left: calc(288px * var(--u));
+  --w-right: calc(320px * var(--u));
+  --w-label: calc(84px * var(--u));
+  --w-val: calc(46px * var(--u));
+
+  /* radios y movimiento */
+  --r-1: calc(2px * var(--u));
+  --r-2: calc(3px * var(--u));
+  --z-pop: 40;
+  --shadow-pop: 0 8px 24px rgb(0 0 0 / 45%);
+  --dur-1: 90ms;
+  --dur-2: 160ms;
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
